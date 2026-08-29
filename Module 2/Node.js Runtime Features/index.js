@@ -7,49 +7,70 @@
  *   2) Flow the file through a stream and pipe it to a writable stream (a copy).
  * Then explain, in your own words, why the stream approach is preferable for
  * large files.
- *
- * The starter already imports `fs` and `path` for you and points at a large
- * sample file (`sample-data.txt`) that lives next to this script.
- *
- * Run it with:  npm start
  */
 
 const fs = require('fs');
 const path = require('path');
 
-// Absolute, OS-safe path to the sample file (do NOT hand-build paths with '+').
+// Absolute, OS-safe path to the sample file
 const INPUT = path.join(__dirname, 'sample-data.txt');
 const OUTPUT = path.join(__dirname, 'sample-copy.txt');
 
-// ── PART 1: read the whole file into memory, then log its size ──────────────
+// ── PART 1: read the whole file into memory ─────────────────────────────────
 function readWholeFile() {
-  // TODO: use fs.readFile(INPUT, callback). With no encoding, the callback
-  //       receives a Buffer.
-  // TODO: if there is an error, log it and return.
-  // TODO: log the size in bytes. A Buffer has a .length property (bytes).
-  //       Example log: "readFile: loaded 524288 bytes into memory".
+  fs.readFile(INPUT, (err, data) => {
+    // Handle error
+    if (err) {
+      console.error('readFile error:', err);
+      return;
+    }
+
+    // Buffer.length gives the size in bytes
+    console.log(`readFile: loaded ${data.length} bytes into memory`);
+  });
 }
 
 // ── PART 2: stream the file and pipe it to a writable stream ────────────────
 function streamFile() {
-  // TODO: create a readable stream with fs.createReadStream(INPUT).
-  // TODO: create a writable stream with fs.createWriteStream(OUTPUT).
-  // TODO: pipe the readable into the writable: readable.pipe(writable).
-  // TODO: listen for the writable's "finish" event and log a done message,
-  //       e.g. "stream: finished copying via 64KB chunks (flat memory)".
+  // Create readable stream
+  const readable = fs.createReadStream(INPUT);
+
+  // Create writable stream
+  const writable = fs.createWriteStream(OUTPUT);
+
+  // // Handle readable stream errors
+  // readable.on('error', (err) => {
+  //   console.error('stream read error:', err);
+  // });
+
+  // // Handle writable stream errors
+  // writable.on('error', (err) => {
+  //   console.error('stream write error:', err);
+  // });
+
+  // Pipe the file from readable stream to writable stream
+  readable.pipe(writable);
+
+  // When copying is finished
+  writable.on('finish', () => {
+    console.log('stream: finished copying via chunks (flat memory)');
+  });
 }
 
-// ── PART 3: explain the difference ──────────────────────────────────────────
-// TODO: In your OWN words, replace this comment with 2 to 3 sentences on WHY
-//       the stream approach is preferable for large files. Mention memory:
-//       readFile holds the whole file at once; the stream moves it in chunks
-//       so peak memory stays flat regardless of file size.
+// ── PART 3: explanation ─────────────────────────────────────────────────────
 //
-// YOUR EXPLANATION:
+// readFile loads the entire file into memory at once, so a large file can
+// consume a lot of RAM. A stream moves the file in small chunks, so only a
+// small amount of data is kept in memory at a time, making it much better
+// for large files.
 //
-
 // Run both approaches.
 readWholeFile();
 streamFile();
 
-module.exports = { readWholeFile, streamFile, INPUT, OUTPUT };
+module.exports = {
+  readWholeFile,
+  streamFile,
+  INPUT,
+  OUTPUT
+};
