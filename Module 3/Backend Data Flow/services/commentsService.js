@@ -11,6 +11,7 @@ const AppError = require('./../utils/AppError');
  *   4. THEN bump the post's count     -> postsRepo.incrementCommentCount(postId)
  *   5. return the created comment
  * No write may happen before both checks pass.
+ * 
  */
 exports.addComment = async (postId, userId, body) => {
   throw new AppError('addComment is not implemented yet', 501);
