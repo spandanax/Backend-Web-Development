@@ -17,41 +17,33 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 const ctrl = require('./../controllers/articlesController');
-const { createArticle, updateArticle } = require('./../validators/articles.validators');
-const checkValidation = require('./../utils/ValidateRequest');
-const asynchandler = require('./../utils/AsyncHandler');
-
-
 
 // INLINE validation result check — should move to utils/validateRequest.js
-//function checkValidation(req, res, next) {
- // const errors = validationResult(req);
-  //if (!errors.isEmpty()) {
-  //  return res.status(422).json({ error: 'Validation failed', details: errors.array() });
-  //}
- // next();
-//}
+function checkValidation(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ error: 'Validation failed', details: errors.array() });
+  }
+  next();
+}
 
 router.get('/', ctrl.list);
 
 // INLINE chains — should move to validators/article.validator.js
-
-router .post(
+router.post(
   '/',
-  createArticle,
+  body('title').notEmpty().withMessage('Title is required').trim(),
+  body('body').notEmpty().isLength({ max: 2000 }).withMessage('Body is required and must be under 2000 characters'),
   checkValidation,
-  asynchandler(ctrl.create)
+  ctrl.create
 );
-
-
-
-
 
 router.patch(
   '/:id',
-  updateArticle,
+  body('title').optional().notEmpty().trim(),
+  body('body').optional().isLength({ max: 2000 }),
   checkValidation,
-  asynchandler(ctrl.update)
+  ctrl.update
 );
 
 module.exports = router;
