@@ -12,7 +12,4 @@ const { randomUUID } = require('crypto');
 
 module.exports = function requestId(req, res, next) {
   // TODO: implement the four steps described above.
-  req.id = randomUUID();
-  res.setHeader('X-Request-Id', req.id);
-  next(); 
 };
