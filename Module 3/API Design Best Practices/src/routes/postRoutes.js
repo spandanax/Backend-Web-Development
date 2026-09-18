@@ -3,9 +3,19 @@ const controller = require('../controllers/postController');
 
 const router = express.Router();
 
-router.get('/Posts', controller.listPosts);
-router.get('/Post/:id', controller.getPost);
-router.post('/Post', controller.createPost);
-router.post('/Post/:id/likes', controller.likePost);
+// Get all posts
+router.get('/posts', controller.listPosts);
+
+// Get one post
+router.get('/posts/:id', controller.getPost);
+
+// Create a post
+router.post('/posts', controller.createPost);
+
+// Like a post
+router.post('/posts/:id/likes', controller.likePost);
+
+// Demo internal error route
+router.get('/demo/internal-error', controller.explode);
 
 module.exports = router;

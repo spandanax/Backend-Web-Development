@@ -5,27 +5,36 @@ const controller = require('./controllers/postController');
 
 function createApp() {
   const app = express();
+
   app.use(express.json());
 
   app.use('/', postRoutes);
+
+  // Safe internal failure route
   app.get('/explode', controller.explode);
 
-  // TODO:
-  // - make public contract resource-oriented
-  // - standardise success envelope
-  // - standardise error envelope
-  // - add pagination metadata on list route
-  // - cap limit server-side (default limit = 2 for exercise)
-  // - stop exposing old verb routes as public contract
-  // - expose safe internal failure route for testing/demo
-  app.use((err, req, res, next) =>{
+  // Central error handler
+  app.use((err, req, res, next) => {
     console.error(err);
 
-    res.status(500).json({
-      error:{
-        Message:'Internal Server Error',
-      }
+    const status = err.statusCode || 500;
+    const code = err.code || 'INTERNAL_ERROR';
 
+    let message = 'Something went wrong';
+
+    if (status === 400) {
+      message = err.message || 'Bad Request';
+    }
+
+    if (status === 404) {
+      message = err.message || 'Not Found';
+    }
+
+    res.status(status).json({
+      error: {
+        code,
+        message
+      }
     });
   });
 
@@ -35,6 +44,7 @@ function createApp() {
 if (require.main === module) {
   const app = createApp();
   const port = 3000;
+
   app.listen(port, () => {
     console.log(`Starter API listening on port ${port}`);
   });
