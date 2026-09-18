@@ -2,14 +2,14 @@ const service = require('../services/postService');
 const http = require('../utils/http');
 
 function listPosts(req, res) {
-  const rows = service.listPosts(req.query);
-  return http.sendList(res, rows);
+  const rows   = service.listPosts(req.query);
+  return http.sendList(res, rows.data, rows.total);
 }
 
 function getPost(req, res) {
   const post = service.getPost(req.params.id);
   if (!post) {
-    return http.sendError(res, 404, { message: 'post missing' });
+    return http.sendError(res, 404, { message: 'post not found' });
   }
   return http.sendOk(res, post);
 }
@@ -28,7 +28,8 @@ function explode(req, res) {
   try {
     service.explode();
   } catch (err) {
-    return http.sendError(res, 500, { error: err.message, stack: err.debug || err.stack });
+    //return http.sendError(res, 500, { error: err.message, stack: err.debug || err.stack });
+    next(err);
   }
 }
 
