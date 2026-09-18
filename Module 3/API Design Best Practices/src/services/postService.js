@@ -36,6 +36,7 @@ function listPosts(query = {}) {
       limit,
       total,
       pages,
+      totalPages: pages,
       hasNext: page < pages,
       hasPrevious: page > 1
     }

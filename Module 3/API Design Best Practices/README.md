@@ -61,7 +61,7 @@ pagination metadata:
 
 ```text
 GET /posts?page=1&limit=20
-200 { data: [...], meta: { page, limit, total, pages, hasNext, hasPrevious } }
+200 { data: [...], meta: { page, limit, total, pages, totalPages, hasNext, hasPrevious } }
 ```
 
 The server caps `limit` at 100, even when a larger value is requested. Missing
@@ -74,7 +74,7 @@ The supported resource routes are:
 - `GET /posts/:id`
 - `POST /posts`
 - `POST /posts/:id/likes`
-- `GET /demo/internal-error` for safe failure testing
+- `GET /explode` for safe failure testing
 
 ## Suggested Manual Checks
 

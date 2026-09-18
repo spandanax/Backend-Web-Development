@@ -15,7 +15,4 @@ router.post('/posts', controller.createPost);
 // Like a post
 router.post('/posts/:id/likes', controller.likePost);
 
-// Demo internal error route
-router.get('/demo/internal-error', controller.explode);
-
 module.exports = router;
