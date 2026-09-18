@@ -54,6 +54,28 @@ npm start
 
 Submit PR link.
 
+## API Contract
+
+All successful responses use a `data` property. The list endpoint also returns
+pagination metadata:
+
+```text
+GET /posts?page=1&limit=20
+200 { data: [...], meta: { page, limit, total, pages, totalPages, hasNext, hasPrevious } }
+```
+
+The server caps `limit` at 100, even when a larger value is requested. Missing
+posts return an `error` object with a stable code and message. Unexpected
+failures return `INTERNAL_ERROR` without stack traces or implementation details.
+
+The supported resource routes are:
+
+- `GET /posts`
+- `GET /posts/:id`
+- `POST /posts`
+- `POST /posts/:id/likes`
+- `GET /explode` for safe failure testing
+
 ## Suggested Manual Checks
 
 After refactor, manually verify:
