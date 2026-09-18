@@ -2,16 +2,19 @@ const store = require('../data/postStore');
 
 function listPosts(query = {}) {
   // Page starts at 1
-  const page = Math.max(Number(query.page) || 1, 1);
+  const requestedPage = Number(query.page);
+  const page = Number.isFinite(requestedPage)
+    ? Math.max(Math.floor(requestedPage), 1)
+    : 1;
 
   // Default limit is 20
-  const requestedLimit = Math.max(
-    Number(query.limit) || 20,
-    1
-  );
+  const requestedLimit = Number(query.limit);
+  const safeLimit = Number.isFinite(requestedLimit)
+    ? Math.max(Math.floor(requestedLimit), 1)
+    : 20;
 
   // Never allow the client to request more than 100 posts
-  const limit = Math.min(requestedLimit, 100);
+  const limit = Math.min(safeLimit, 100);
 
   const allPosts = store.getAllPosts();
 
@@ -32,7 +35,9 @@ function listPosts(query = {}) {
       page,
       limit,
       total,
-      pages
+      pages,
+      hasNext: page < pages,
+      hasPrevious: page > 1
     }
   };
 }

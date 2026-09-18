@@ -1,7 +1,6 @@
 const express = require('express');
 const postRoutes = require('./routes/postRoutes');
 const { resetData } = require('./data/postStore');
-const controller = require('./controllers/postController');
 
 function createApp() {
   const app = express();
@@ -10,25 +9,29 @@ function createApp() {
 
   app.use('/', postRoutes);
 
-  // Safe internal failure route
-  app.get('/explode', controller.explode);
+  app.use((req, res) => {
+    res.status(404).json({
+      error: {
+        code: 'ROUTE_NOT_FOUND',
+        message: 'Route not found'
+      }
+    });
+  });
 
   // Central error handler
   app.use((err, req, res, next) => {
     console.error(err);
 
-    const status = err.statusCode || 500;
-    const code = err.code || 'INTERNAL_ERROR';
-
-    let message = 'Something went wrong';
-
-    if (status === 400) {
-      message = err.message || 'Bad Request';
-    }
-
-    if (status === 404) {
-      message = err.message || 'Not Found';
-    }
+    const status = err.statusCode || err.status || 500;
+    const isKnownClientError = status === 400 || status === 404;
+    const code = isKnownClientError && err.code
+      ? err.code
+      : status === 404 ? 'ROUTE_NOT_FOUND' : 'INTERNAL_ERROR';
+    const message = status === 400 && err.code === 'VALIDATION_ERROR'
+      ? err.message
+      : status === 404 && err.code === 'NOT_FOUND'
+        ? err.message
+        : status === 404 ? 'Route not found' : 'Something went wrong';
 
     res.status(status).json({
       error: {

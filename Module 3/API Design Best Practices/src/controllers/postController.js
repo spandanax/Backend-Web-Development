@@ -4,18 +4,11 @@ const http = require('../utils/http');
 function listPosts(req, res) {
   const rows = service.listPosts(req.query);
 
-  return http.sendList(res, rows.data, rows.total);
+  return http.sendList(res, rows.data, rows.meta);
 }
 
 function getPost(req, res) {
   const post = service.getPost(req.params.id);
-
-  if (!post) {
-    return http.sendError(res, 404, {
-      code: 'POST_NOT_FOUND',
-      message: 'Post not found'
-    });
-  }
 
   return http.sendOk(res, post);
 }
@@ -28,13 +21,6 @@ function createPost(req, res) {
 
 function likePost(req, res) {
   const post = service.likePost(req.params.id);
-
-  if (!post) {
-    return http.sendError(res, 404, {
-      code: 'POST_NOT_FOUND',
-      message: 'Post not found'
-    });
-  }
 
   return http.sendOk(res, {
     id: post.id,

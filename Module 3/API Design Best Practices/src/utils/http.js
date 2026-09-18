@@ -17,7 +17,7 @@ function sendOk(res, post) {
   });
 }
 
-function sendError(res, status, code, message) {
+function sendError(res, status, { code, message }) {
   return res.status(status).json({
     error: {
       code,
