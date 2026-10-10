@@ -1,0 +1,39 @@
+let posts = [];
+let nextId = 1;
+
+function findAll(){
+    return [...posts];
+}
+
+function findById(id){
+    return posts.find(post => post.id === Number(id)) || null;
+
+}
+
+function create(input){
+    const post = {id: nextId++, ...input, createdAt: Date.now()};
+
+    posts.push(post);
+    return   { ...post};
+}
+
+function update(id, patch){
+    const index = posts.findIndex(post => post.id === Number(id));
+    if(index === -1) return null;
+    posts[index] = { ...posts[index], ...patch };
+    return { ...posts[index] };
+}
+
+function remove(id){
+    const index = posts.findIndex(post => post.id === Number(id));
+    if(index === -1) return false;
+    const [post] = posts.splice(index, 1);
+    return { ...post };
+}
+
+module.exports = {
+    findAll,
+    findById,create,
+    update,
+    remove
+};
