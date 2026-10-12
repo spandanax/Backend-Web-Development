@@ -1,39 +1,40 @@
-let posts = [];
-let nextId = 1;
+const postStore = require('../data/postStore');
 
-function findAll(){
-    return [...posts];
+function findAll() {
+  return postStore.posts.map((post) => ({ ...post }));
 }
 
-function findById(id){
-    return posts.find(post => post.id === Number(id)) || null;
-
+function findById(id) {
+  const post = postStore.posts.find((post) => post.id === Number(id));
+  return post ? { ...post } : null;
 }
 
-function create(input){
-    const post = {id: nextId++, ...input, createdAt: Date.now()};
-
-    posts.push(post);
-    return   { ...post};
+function create(input) {
+  const post = { ...input, id: postStore.nextId() };
+  postStore.posts.push(post);
+  return { ...post };
 }
 
-function update(id, patch){
-    const index = posts.findIndex(post => post.id === Number(id));
-    if(index === -1) return null;
-    posts[index] = { ...posts[index], ...patch };
-    return { ...posts[index] };
+function update(id, patch) {
+  const index = postStore.posts.findIndex((post) => post.id === Number(id));
+  if (index === -1) return null;
+
+  postStore.posts[index] = { ...postStore.posts[index], ...patch };
+  return { ...postStore.posts[index] };
 }
 
-function remove(id){
-    const index = posts.findIndex(post => post.id === Number(id));
-    if(index === -1) return false;
-    const [post] = posts.splice(index, 1);
-    return { ...post };
+function remove(id) {
+  const index = postStore.posts.findIndex((post) => post.id === Number(id));
+  if (index === -1) return false;
+
+  const [post] = postStore.posts.splice(index, 1);
+  return { ...post };
 }
 
 module.exports = {
-    findAll,
-    findById,create,
-    update,
-    remove
+  findAll,
+  findById,
+  create,
+  update,
+  remove,
 };
