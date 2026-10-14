@@ -22,4 +22,10 @@ npm run prisma:migrate
 
 Use `npm run prisma:deploy` to apply committed migrations in a deployment environment.
 
+The User, Post, Comment, Vote, Follow, Tag, and PostTag repositories all use the
+shared Prisma client. Each exposes `findAll`, `findById`, `create`, `update`,
+and `remove`; Vote, Follow, and PostTag use their composite keys for lookups.
+Database constraint failures return controlled 4xx responses, while unexpected
+database failures are logged and returned as a generic 500 response.
+
 Read the platform question before editing. Do not add platform-only `question.md`, answer files, tests, or specs to this repository. Never commit `.env` or real credentials.
