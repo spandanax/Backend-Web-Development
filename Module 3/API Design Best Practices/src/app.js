@@ -5,19 +5,44 @@ const controller = require('./controllers/postController');
 
 function createApp() {
   const app = express();
+
   app.use(express.json());
 
   app.use('/', postRoutes);
+
   app.get('/explode', controller.explode);
 
-  // TODO:
-  // - make public contract resource-oriented
-  // - standardise success envelope
-  // - standardise error envelope
-  // - add pagination metadata on list route
-  // - cap limit server-side (default limit = 2 for exercise)
-  // - stop exposing old verb routes as public contract
-  // - expose safe internal failure route for testing/demo
+  app.use((req, res) => {
+    res.status(404).json({
+      error: {
+        code: 'ROUTE_NOT_FOUND',
+        message: 'Route not found'
+      }
+    });
+  });
+
+  // Central error handler
+  app.use((err, req, res, next) => {
+    console.error(err);
+
+    const status = err.statusCode || err.status || 500;
+    const isKnownClientError = status === 400 || status === 404;
+    const code = isKnownClientError && err.code
+      ? err.code
+      : status === 404 ? 'ROUTE_NOT_FOUND' : 'INTERNAL_ERROR';
+    const message = status === 400 && err.code === 'VALIDATION_ERROR'
+      ? err.message
+      : status === 404 && err.code === 'NOT_FOUND'
+        ? err.message
+        : status === 404 ? 'Route not found' : 'Something went wrong';
+
+    res.status(status).json({
+      error: {
+        code,
+        message
+      }
+    });
+  });
 
   return app;
 }
@@ -25,6 +50,7 @@ function createApp() {
 if (require.main === module) {
   const app = createApp();
   const port = 3000;
+
   app.listen(port, () => {
     console.log(`Starter API listening on port ${port}`);
   });
