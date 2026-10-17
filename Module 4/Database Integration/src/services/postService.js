@@ -14,10 +14,11 @@ async function createPost(fields) {
     error.statusCode = 422;
     throw error;
   }
+
   return postRepository.create({
     title: fields.title,
     body: fields.body || '',
-    authorId: fields.authorId,
+    authorId: fields.authorId
   });
 }
 
@@ -29,4 +30,10 @@ async function removePost(id) {
   return postRepository.remove(id);
 }
 
-module.exports = { listPosts, getPost, createPost, updatePost, removePost };
+module.exports = {
+  listPosts,
+  getPost,
+  createPost,
+  updatePost,
+  removePost
+};
